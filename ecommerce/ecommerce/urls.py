@@ -16,6 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,4 +26,10 @@ urlpatterns = [
     path('categories/', include('Category.urls')),
     path('products/', include('Product.urls')),
     path('order/', include('Order.urls')),
+    path('cart/', include('Cart.urls')),
+    path('address/', include('Address.urls')),
+    path('payment/', include('Payment.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
