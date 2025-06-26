@@ -16,7 +16,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
 
 
 class ProductVariantViewSet(viewsets.ModelViewSet):
-    queryset = ProductVariant.objects.all()
+    queryset = ProductVariant.objects.filter(stock__gt=0)
     serializer_class = ProductVariantSerializer
     permission_classes = [permissions.IsAdminUser]  # Only admin can add/update/delete   
 

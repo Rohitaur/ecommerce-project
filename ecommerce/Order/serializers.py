@@ -14,6 +14,15 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # subcategory ko product ke through set karo
         product = validated_data['product']
+        quantity = validated_data['quantity']
+
+        if product.stock < quantity:
+            raise ValidationError("Not enough stock available.")
+        
+        product.stock -= quantity
+        product.save()
+
+        
         validated_data['subcategory'] = product.subcategory
         # user ko bhi set karo agar zarurat ho
         request = self.context.get('request', None)

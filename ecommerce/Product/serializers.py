@@ -30,6 +30,9 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['created_by', 'updated_by', 'created_at', 'updated_at']
 
-
+    
+    def get_variants(self, obj):
+        variants = obj.variants.filter(stock__gt=0)
+        return ProductVariantSerializer(variants, many=True).data
     
 
