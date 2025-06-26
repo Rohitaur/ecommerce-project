@@ -3,8 +3,8 @@
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import Category
-from .serializers import CategorySerializer
+from .models import Category, SubCategory
+from .serializers import CategorySerializer, SubCategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -15,7 +15,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     filterset_fields = ['name']  
     search_fields = ['name']     
     ordering_fields = ['name', 'created_at']
-    permission_classes = [IsAuthenticated] 
+    # permission_classes = [IsAuthenticated] 
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user, updated_by=self.request.user)
@@ -24,7 +24,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer.save(updated_by=self.request.user)
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'destroy']:
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
             permission_classes = [IsAdminUser]
         else:
             permission_classes = [IsAuthenticated]
@@ -87,3 +87,22 @@ class CategoryViewSet(viewsets.ModelViewSet):
             "status": status.HTTP_204_NO_CONTENT,
             "data": {}
         }, status=status.HTTP_204_NO_CONTENT)
+    
+
+
+
+class SubCategoryViewSet(viewsets.ModelViewSet):
+    queryset = SubCategory.objects.all()
+    serializer_class = SubCategorySerializer
+    permission_classes = [IsAuthenticated]
+
+    # filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    # filterset_fields = ['name']  
+    # search_fields = ['name'] 
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]

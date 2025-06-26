@@ -27,7 +27,7 @@ class ProductFilter(FilterSet):
 
     class Meta:
         model = Product
-        fields = ['category', 'brand', 'name', 'price_min', 'price_max']
+        fields = ['subcategory', 'brand', 'name', 'price_min', 'price_max']
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -36,7 +36,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ProductFilter
-    filterset_fields = ['category', 'price', 'brand', 'name']
+    filterset_fields = ['subcategory', 'price', 'brand', 'name']
     search_fields = ['name', 'brand']
     ordering_fields = ['name', 'price', 'created_at', 'brand']  
     def get_permissions(self):
@@ -45,9 +45,15 @@ class ProductViewSet(viewsets.ModelViewSet):
         - Admin can create, update, delete
         - Any authenticated user can retrieve (view) products
         """
-        if self.action in ['create', 'update', 'destroy']:
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAdminUser()]  # Only admins can create, update, or destroy
         return super().get_permissions()  # Allow authenticated users to view details
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, updated_by=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user)
 
     # POST
     def create(self, request, *args, **kwargs):
@@ -55,11 +61,18 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data, many=is_many)
         if serializer.is_valid():
             self.perform_create(serializer)
+            # Naya serializer instance banayein, taki created_by/updated_by reflect ho
+            if is_many:
+            # Bulk create ke liye queryset fetch karein
+                products = Product.objects.filter(pk__in=[obj.pk for obj in serializer.instance])
+                response_serializer = self.get_serializer(products, many=True)
+            else:
+                response_serializer = self.get_serializer(serializer.instance)
             return Response({
                 "message": "Product created successfully",
                 "key": "success",
                 "status": status.HTTP_201_CREATED,
-                "data": serializer.data
+                "data": response_serializer.data
             }, status=status.HTTP_201_CREATED)
         else:
             # Collect error messages from serializer.errors
@@ -82,11 +95,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     # PUT: Full update 
-    def update(self, request, pk=None):
+    def update(self, request, pk=None, partial=False):
         product = self.get_object()
-        serializer = self.get_serializer(product, data=request.data)
+        serializer = self.get_serializer(product, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        self.perform_update(serializer)
         return Response(serializer.data)
 
     # DELETE

@@ -11,23 +11,18 @@ class OrderViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'], url_path='place-order')
     def place_order(self, request):
-        serializer = OrderSerializer(data=request.data)
+        serializer = OrderSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             order = serializer.save(user=request.user)
             # Payment create karo
-            Payment.objects.create(
-                order=order,
-                user=request.user,
-                amount=order.total_price,  # Order model me total_price hona chahiye
-                payment_method='cod'
-            )
+
             order.refresh_from_db()  # Fresh order fetch for response
             response_serializer = OrderSerializer(order)
             return Response({
                 "message": "Order placed successfully",
                 "key": "success",
                 "status": status.HTTP_201_CREATED,
-                "data": serializer.data
+                "data": response_serializer.data
             }, status=status.HTTP_201_CREATED)
         return Response({
             "message": "Order placement failed",

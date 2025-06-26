@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView
 from .models import CustomUser
@@ -88,10 +88,22 @@ class ProfileAPI(APIView):
 class UserListAPI(ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
 class UserDetailAPI(RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
+
+
+    def get_object(self):
+        obj = super().get_object()
+        user = self.request.user
+        # Admin/superuser can access anyone, normal user only self
+        if user.is_superuser or user.is_staff:
+            return obj
+        if obj.id != user.id:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to access this user.")
+        return obj
