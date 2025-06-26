@@ -3,9 +3,7 @@ from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    # brand = models.CharField(max_length=100, blank=True, default="")
     description = models.TextField(blank=True, default="")
-
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -22,3 +20,13 @@ class Category(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.description[:30]}... (Created: {self.created_at}, Updated: {self.updated_at})"
+    
+
+
+class SubCategory(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, default="")
+
+    def __str__(self):
+        return f"{self.name} ({self.category.name})"
