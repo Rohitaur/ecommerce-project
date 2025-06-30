@@ -14,8 +14,6 @@ class OrderViewSet(viewsets.ViewSet):
         serializer = OrderSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             order = serializer.save(user=request.user)
-            # Payment create karo
-
             order.refresh_from_db()  # Fresh order fetch for response
             response_serializer = OrderSerializer(order)
             return Response({
