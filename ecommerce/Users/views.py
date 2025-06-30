@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView
 from .models import CustomUser
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import PermissionDenied
 
 
 
@@ -26,7 +27,6 @@ class RegisterAPI(APIView):
                 }
             }, status=status.HTTP_201_CREATED)
         else:
-            # Get first error message from serializer.errors
             error_messages = []
             for field, errors in serializer.errors.items():
                 for error in errors:
@@ -51,7 +51,6 @@ class LoginAPI(APIView):
             user_data = {
                 "id": user.id,
                 "email": user.email,
-                # "role": user.role,  # Agar role field hai to use include karein
                 "name": user.name
             }
             return Response({
@@ -104,6 +103,5 @@ class UserDetailAPI(RetrieveUpdateDestroyAPIView):
         if user.is_superuser or user.is_staff:
             return obj
         if obj.id != user.id:
-            from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("You do not have permission to access this user.")
         return obj
