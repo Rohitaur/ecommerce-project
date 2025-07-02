@@ -6,6 +6,7 @@ class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     brand = models.CharField(max_length=100, blank=True, default="")  # brand field added
+    stock = models.PositiveIntegerField(default=1)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     is_active = models.BooleanField(default=True)

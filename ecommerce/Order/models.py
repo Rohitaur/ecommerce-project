@@ -1,7 +1,9 @@
 from django.db import models
 from django.conf import settings
 from Category.models import Category , SubCategory 
-from Product.models import Product  
+from Product.models import Product , ProductVariant 
+from Address.models import Address
+
 
 class Order(models.Model):
     ORDER_STATUS = [
@@ -16,6 +18,8 @@ class Order(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variant= models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name='orders', null=True, blank=True)
+    address = models.ForeignKey(Address,  on_delete=models.SET_NULL, null=True, blank=True) 
     # category = models.ForeignKey(Category, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name='orders', null=True, blank=True)
     quantity = models.PositiveIntegerField()

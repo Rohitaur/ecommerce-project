@@ -22,7 +22,8 @@ class RegisterAPI(APIView):
                 "status": status.HTTP_201_CREATED,
                 "data": {
                     "email": user.email,
-                    "name": user.name,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
                     "phone": user.phone,
                 }
             }, status=status.HTTP_201_CREATED)
@@ -51,7 +52,8 @@ class LoginAPI(APIView):
             user_data = {
                 "id": user.id,
                 "email": user.email,
-                "name": user.name
+                "first_name": user.first_name,
+                "last_name": user.last_name,
             }
             return Response({
                 "message": "Login successful",
