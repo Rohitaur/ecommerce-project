@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,15 +42,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'rest_framework_simplejwt.token_blacklist',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
     'django_filters',
     'rest_framework.authtoken',
+    'drf_yasg',
     'Users',
     'Product',
     'Order',
     'Cart',
     'Address',
     'Payment',
-    'Category',
+    'Category', 
 ] 
 
 MIDDLEWARE = [
