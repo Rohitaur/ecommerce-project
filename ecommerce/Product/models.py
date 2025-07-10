@@ -20,6 +20,13 @@ class Product(models.Model):
         return f"{self.name}--{self.description}--{self.is_active}"
     
 
+    def update_stock(self):
+        total_stock = sum(variant.stock for variant in self.variants.all())
+        self.stock = total_stock
+        self.save()
+
+    
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='product_images/')
@@ -38,6 +45,18 @@ class ProductVariant(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.size} - {self.color}"
+    
+    # models.py (inside ProductVariant class)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.product.update_stock()  
+
+    def delete(self, *args, **kwargs):
+        product = self.product
+        super().delete(*args, **kwargs)
+        product.update_stock()  
+
     
 
 

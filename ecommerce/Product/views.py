@@ -11,14 +11,13 @@ from Order.models import Order
 class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer
-    permission_classes = [permissions.IsAdminUser]  # Only admin can add/delete images
-
+    permission_classes = [permissions.IsAdminUser]  
 
 
 class ProductVariantViewSet(viewsets.ModelViewSet):
     queryset = ProductVariant.objects.filter(stock__gt=0)
     serializer_class = ProductVariantSerializer
-    permission_classes = [permissions.IsAdminUser]  # Only admin can add/update/delete   
+    permission_classes = [permissions.IsAdminUser]   
 
 
 class ProductFilter(FilterSet):

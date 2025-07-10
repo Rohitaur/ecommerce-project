@@ -17,6 +17,7 @@ class Category(models.Model):
         related_name='categories_updated'
     )
     updated_at = models.DateTimeField(auto_now=True)
+ 
 
     def __str__(self):
         return f"{self.name} - {self.description[:30]}... (Created: {self.created_at}, Updated: {self.updated_at})"

@@ -26,6 +26,7 @@ class OrderSerializer(serializers.ModelSerializer):
         payment_method = validated_data.pop('payment_method')
 
         variant = ProductVariant.objects.filter(product=product, stock__gte=quantity).first()
+       
 
         # if variant is None:
         #     raise ValidationError("Product variant is required.")

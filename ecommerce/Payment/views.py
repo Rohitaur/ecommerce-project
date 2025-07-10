@@ -15,5 +15,5 @@ class PaymentViewSet(viewsets.ModelViewSet):
         order = serializer.validated_data['order']
         serializer.save(
             user=self.request.user,
-            amount=order.total_price  # Order model me total_price field hona chahiye
+            amount=order.total_price  
         )
